@@ -17,10 +17,18 @@ interface AppointmentForm {
   description: string;
 }
 
+interface Task {
+  id: string;
+  description: string;
+  notes: string;
+  expectedTimeMinutes: number;
+}
+
 interface GoalForm {
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high';
+  tasks: Task[];
 }
 
 export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate }: DayDetailsProps) {
@@ -35,7 +43,8 @@ export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate
   const [goalForm, setGoalForm] = useState<GoalForm>({
     title: '',
     description: '',
-    priority: 'medium'
+    priority: 'medium',
+    tasks: []
   });
 
   if (!selectedDay) return null;
@@ -52,7 +61,7 @@ export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate
     e.preventDefault();
     console.log('Creating goal:', { ...goalForm, date: selectedDay });
     // Here you would typically make an API call to create the goal
-    setGoalForm({ title: '', description: '', priority: 'medium' });
+    setGoalForm({ title: '', description: '', priority: 'medium', tasks: [] });
     setShowGoalModal(false);
   };
 
