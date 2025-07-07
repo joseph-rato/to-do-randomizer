@@ -1,103 +1,159 @@
+"use client";
+import { useState, useEffect } from "react";
+import { addMonths, subMonths, format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay } from "date-fns";
 import Image from "next/image";
+import Calendar from "./Calendar";
+import DayDetails from "./DayDetails";
+
+// Dummy fetch functions
+function fetchAppointments(month: Date) {
+  return new Promise<{ id: number; date: string; title: string; type: 'appointment' }[]>(resolve => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, date: format(month, 'yyyy-MM-05'), title: 'Dentist', type: 'appointment' },
+        { id: 2, date: format(month, 'yyyy-MM-12'), title: 'Team Meeting', type: 'appointment' },
+      ]);
+    }, 400);
+  });
+}
+
+function fetchEvents(month: Date) {
+  return new Promise<{ id: number; date: string; title: string; type: 'event' }[]>(resolve => {
+    setTimeout(() => {
+      resolve([
+        { id: 3, date: format(month, 'yyyy-MM-12'), title: 'Birthday Party', type: 'event' },
+        { id: 4, date: format(month, 'yyyy-MM-20'), title: 'Conference', type: 'event' },
+      ]);
+    }, 400);
+  });
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [items, setItems] = useState<{ id: number; date: string; title: string; type: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      fetchAppointments(currentMonth),
+      fetchEvents(currentMonth)
+    ]).then(([appointments, events]) => {
+      setItems([...appointments, ...events]);
+      setLoading(false);
+    });
+  }, [currentMonth]);
+
+  const handleDaySelect = (date: string) => {
+    console.log(date);
+    setSelectedDay(date);
+  };
+
+  const handleMonthChange = (date: Date) => {
+    console.log(date);
+    setCurrentMonth(date);
+    setSelectedDay(null);
+  };
+
+  const selectedDayItems = selectedDay ? items.filter(item => item.date === selectedDay) : [];
+
+  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+
+  const renderHeader = () => (
+    <div className="flex items-center justify-between mb-4">
+      <button
+        onClick={prevMonth}
+        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        aria-label="Previous Month"
+      >
+        <span className="text-xl">&#8592;</span>
+      </button>
+      <h2 className="text-xl font-semibold">
+        {format(currentMonth, "MMMM yyyy")}
+      </h2>
+      <button
+        onClick={nextMonth}
+        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        aria-label="Next Month"
+      >
+        <span className="text-xl">&#8594;</span>
+      </button>
+    </div>
+  );
+
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const renderDays = () => (
+    <div className="grid grid-cols-7 mb-2">
+      {daysOfWeek.map((day) => (
+        <div
+          key={day}
+          className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-1"
+        >
+          {day}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      ))}
+    </div>
+  );
+
+  const renderCells = () => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(monthStart);
+    const startDate = startOfWeek(monthStart);
+    const endDate = endOfWeek(monthEnd);
+
+    const rows = [];
+    let days = [];
+    let day = startDate;
+    let formattedDate = "";
+
+    while (day <= endDate) {
+      for (let i = 0; i < 7; i++) {
+        formattedDate = format(day, "d");
+        const cloneDay = day;
+        days.push(
+          <div
+            key={day.toString()}
+            className={`h-16 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-800 cursor-pointer rounded-lg m-0.5 transition-colors
+              ${!isSameMonth(day, monthStart) ? "bg-gray-50 text-gray-300 dark:bg-gray-900 dark:text-gray-700" : "bg-white dark:bg-black"}
+              ${isSameDay(day, new Date()) ? "border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-bold" : ""}
+              hover:bg-blue-100 dark:hover:bg-blue-800`}
+          >
+            <span>{formattedDate}</span>
+          </div>
+        );
+        day = addDays(day, 1);
+      }
+      rows.push(
+        <div className="grid grid-cols-7" key={day.toString()}>
+          {days}
+        </div>
+      );
+      days = [];
+    }
+    return <div>{rows}</div>;
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row items-start justify-center min-h-screen bg-gray-50 dark:bg-black p-4 sm:p-10 gap-8">
+      <div className="flex-1 flex justify-center w-full">
+        {loading ? (
+          <div className="flex justify-center items-center h-40 text-gray-400">Loading...</div>
+        ) : (
+          <Calendar
+            items={items}
+            selectedDay={selectedDay}
+            onDaySelect={handleDaySelect}
+            currentMonth={currentMonth}
+            onMonthChange={handleMonthChange}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        )}
+      </div>
+      {selectedDay && (
+        <DayDetails selectedDay={selectedDay} selectedDayItems={selectedDayItems} />
+      )}
     </div>
   );
 }
