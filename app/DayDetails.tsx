@@ -3,10 +3,11 @@ import { useState } from "react";
 import { format } from "date-fns";
 import AppointmentModal from "./AppointmentModal";
 import GoalModal from "./GoalModal";
+import EventDetails from "./EventDetails";
 
 interface DayDetailsProps {
   selectedDay: string | null;
-  selectedDayItems: { id: number; date: string; title: string; type: string }[];
+  selectedDayItems: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[];
 }
 
 interface AppointmentForm {
@@ -24,6 +25,7 @@ interface GoalForm {
 export default function DayDetails({ selectedDay, selectedDayItems }: DayDetailsProps) {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
+  const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
   const [appointmentForm, setAppointmentForm] = useState<AppointmentForm>({
     title: '',
     time: '',
@@ -53,6 +55,10 @@ export default function DayDetails({ selectedDay, selectedDayItems }: DayDetails
     setShowGoalModal(false);
   };
 
+  const toggleItemExpansion = (itemId: number) => {
+    setExpandedItemId(expandedItemId === itemId ? null : itemId);
+  };
+
   return (
     <>
       <div className="flex-1 max-w-xs w-full bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-6 mt-8 sm:mt-0">
@@ -62,11 +68,12 @@ export default function DayDetails({ selectedDay, selectedDayItems }: DayDetails
         ) : (
           <ul className="space-y-2">
             {selectedDayItems.map(item => (
-              <li key={item.id} className="flex items-center gap-2">
-                <span className={`inline-block w-2 h-2 rounded-full ${item.type === 'appointment' ? 'bg-blue-500' : 'bg-green-500'}`}></span>
-                <span className="font-medium">{item.title}</span>
-                <span className="text-xs text-gray-400">({item.type})</span>
-              </li>
+              <EventDetails
+                key={item.id}
+                item={item}
+                isExpanded={expandedItemId === item.id}
+                onToggle={() => toggleItemExpansion(item.id)}
+              />
             ))}
           </ul>
         )}
