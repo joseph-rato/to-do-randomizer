@@ -46,14 +46,12 @@ export default function Home() {
   }, [currentMonth]);
 
   const handleDaySelect = (date: string) => {
-    console.log(date);
     setSelectedDay(date);
   };
 
-  const handleMonthChange = (date: Date) => {
-    console.log(date);
+  const handleMonthChange = (date: Date, dayToSelect?: string) => {
     setCurrentMonth(date);
-    setSelectedDay(null);
+    setSelectedDay(dayToSelect ?? null);
   };
 
   const selectedDayItems = selectedDay ? items.filter(item => item.date === selectedDay) : [];

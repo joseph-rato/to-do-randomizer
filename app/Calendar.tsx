@@ -13,7 +13,7 @@ interface CalendarProps {
   selectedDay: string | null;
   onDaySelect: (date: string) => void;
   currentMonth: Date;
-  onMonthChange: (date: Date) => void;
+  onMonthChange: (date: Date, dayToSelect?: string) => void;
 }
 
 export default function Calendar({ items, selectedDay, onDaySelect, currentMonth, onMonthChange }: CalendarProps) {
@@ -57,11 +57,15 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
     </div>
   );
 
-  const handleDayClick = (day: Date, monthStart: Date, isoDate: string) => {
-    if (!isSameMonth(day, monthStart)) {
+  const handleDayClick = (day: Date, currentMonth: Date, isoDate: string) => {
+    console.log("test")
+    if (!isSameMonth(day, currentMonth)) {
+        console.log("clicked");
+        console.log(day);
+        console.log(currentMonth);
+        console.log(isoDate);
       // Change to the month of the clicked day and select the day
-      onMonthChange(startOfMonth(day));
-      onDaySelect(isoDate);
+      onMonthChange(startOfMonth(day), isoDate);
     } else {
       // Just select the day
       onDaySelect(isoDate);
@@ -81,6 +85,7 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
+        let currentDay=day;
         formattedDate = format(day, "d");
         const isoDate = format(day, 'yyyy-MM-dd');
         const dayItems = items.filter(item => item.date === isoDate);
@@ -88,7 +93,7 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
         days.push(
           <div
             key={day.toString()}
-            onClick={() => handleDayClick(day, monthStart, isoDate)}
+            onClick={() => handleDayClick(currentDay, currentMonth, isoDate)}
             className={`h-16 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-800 cursor-pointer rounded-lg m-0.5 transition-colors
               ${!isSameMonth(day, monthStart) ? "bg-gray-50 text-gray-300 dark:bg-gray-900 dark:text-gray-700 cursor-pointer" : "bg-white dark:bg-black"}
               ${isSameDay(day, new Date()) ? "border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200 font-bold" : ""}
