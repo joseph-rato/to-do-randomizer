@@ -8,6 +8,7 @@ import EventDetails from "./EventDetails";
 interface DayDetailsProps {
   selectedDay: string | null;
   selectedDayItems: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[];
+  onItemUpdate?: (updatedItem: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }) => void;
 }
 
 interface AppointmentForm {
@@ -22,7 +23,7 @@ interface GoalForm {
   priority: 'low' | 'medium' | 'high';
 }
 
-export default function DayDetails({ selectedDay, selectedDayItems }: DayDetailsProps) {
+export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate }: DayDetailsProps) {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
@@ -59,6 +60,12 @@ export default function DayDetails({ selectedDay, selectedDayItems }: DayDetails
     setExpandedItemId(expandedItemId === itemId ? null : itemId);
   };
 
+  const handleItemUpdate = (updatedItem: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }) => {
+    if (onItemUpdate) {
+      onItemUpdate(updatedItem);
+    }
+  };
+
   return (
     <>
       <div className="flex-1 max-w-xs w-full bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-6 mt-8 sm:mt-0">
@@ -73,21 +80,22 @@ export default function DayDetails({ selectedDay, selectedDayItems }: DayDetails
                 item={item}
                 isExpanded={expandedItemId === item.id}
                 onToggle={() => toggleItemExpansion(item.id)}
+                onUpdate={handleItemUpdate}
               />
             ))}
           </ul>
         )}
         
-        <div className="mt-6 space-y-2">
+        <div className="mt-6 flex gap-2">
           <button
             onClick={() => setShowAppointmentModal(true)}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Add Appointment
           </button>
           <button
             onClick={() => setShowGoalModal(true)}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Add Goal
           </button>

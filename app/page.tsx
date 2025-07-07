@@ -4,6 +4,8 @@ import { addMonths, subMonths, format, startOfMonth, endOfMonth, startOfWeek, en
 import Image from "next/image";
 import Calendar from "./Calendar";
 import DayDetails from "./DayDetails";
+import RandomTaskButton from "./RandomTaskButton";
+import Confetti from "./Confetti";
 
 // Dummy fetch functions
 function fetchAppointments(month: Date) {
@@ -62,9 +64,10 @@ function fetchEvents(month: Date) {
 
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [items, setItems] = useState<{ id: number; date: string; title: string; type: string }[]>([]);
+  const [items, setItems] = useState<{ id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -87,6 +90,20 @@ export default function Home() {
   };
 
   const selectedDayItems = selectedDay ? items.filter(item => item.date === selectedDay) : [];
+
+  const handleConfettiTrigger = () => {
+    setShowConfetti(true);
+    // Hide confetti after 3 seconds
+    setTimeout(() => setShowConfetti(false), 3000);
+  };
+
+  const handleItemUpdate = (updatedItem: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }) => {
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === updatedItem.id ? updatedItem : item
+      )
+    );
+  };
 
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -167,23 +184,32 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start justify-center min-h-screen bg-gray-50 dark:bg-black p-4 sm:p-10 gap-8">
-      <div className="flex-1 flex justify-center w-full">
-        {loading ? (
-          <div className="flex justify-center items-center h-40 text-gray-400">Loading...</div>
-        ) : (
-          <Calendar
-            items={items}
-            selectedDay={selectedDay}
-            onDaySelect={handleDaySelect}
-            currentMonth={currentMonth}
-            onMonthChange={handleMonthChange}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-black p-4 sm:p-10 gap-8">
+      <div className="flex flex-col sm:flex-row items-start justify-center w-full gap-8">
+        <div className="flex-1 flex justify-center w-full">
+          {loading ? (
+            <div className="flex justify-center items-center h-40 text-gray-400">Loading...</div>
+          ) : (
+            <Calendar
+              items={items}
+              selectedDay={selectedDay}
+              onDaySelect={handleDaySelect}
+              currentMonth={currentMonth}
+              onMonthChange={handleMonthChange}
+            />
+          )}
+        </div>
+        {selectedDay && (
+          <DayDetails 
+            selectedDay={selectedDay} 
+            selectedDayItems={selectedDayItems} 
+            onItemUpdate={handleItemUpdate}
           />
         )}
       </div>
-      {selectedDay && (
-        <DayDetails selectedDay={selectedDay} selectedDayItems={selectedDayItems} />
-      )}
+      
+      <RandomTaskButton onConfettiTrigger={handleConfettiTrigger} />
+      <Confetti isVisible={showConfetti} />
     </div>
   );
 }
