@@ -58,12 +58,7 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
   );
 
   const handleDayClick = (day: Date, currentMonth: Date, isoDate: string) => {
-    console.log("test")
     if (!isSameMonth(day, currentMonth)) {
-        console.log("clicked");
-        console.log(day);
-        console.log(currentMonth);
-        console.log(isoDate);
       // Change to the month of the clicked day and select the day
       onMonthChange(startOfMonth(day), isoDate);
     } else {
