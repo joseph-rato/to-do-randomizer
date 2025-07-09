@@ -7,7 +7,8 @@ import EventDetails from "./EventDetails";
 
 interface DayDetailsProps {
   selectedDay: string | null;
-  selectedDayItems: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[];
+  selectedDayAppointments: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[];
+  selectedDayEvents: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[];
   onItemUpdate?: (updatedItem: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }) => void;
 }
 
@@ -31,7 +32,7 @@ interface GoalForm {
   tasks: Task[];
 }
 
-export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate }: DayDetailsProps) {
+export default function DayDetails({ selectedDay, selectedDayAppointments, selectedDayEvents, onItemUpdate }: DayDetailsProps) {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
@@ -75,15 +76,17 @@ export default function DayDetails({ selectedDay, selectedDayItems, onItemUpdate
     }
   };
 
+  const allSelectedDayItems = [...selectedDayAppointments, ...selectedDayEvents];
+
   return (
     <>
       <div className="flex-1 max-w-xs w-full bg-white dark:bg-neutral-900 rounded-2xl shadow-lg p-6 mt-8 sm:mt-0">
         <h3 className="text-lg font-semibold mb-2">Details for {format(new Date(selectedDay), 'MMMM d, yyyy')}</h3>
-        {selectedDayItems.length === 0 ? (
+        {allSelectedDayItems.length === 0 ? (
           <div className="text-gray-400">No events or appointments.</div>
         ) : (
           <ul className="space-y-2">
-            {selectedDayItems.map(item => (
+            {allSelectedDayItems.map(item => (
               <EventDetails
                 key={item.id}
                 item={item}

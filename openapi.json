@@ -1,0 +1,328 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ToDoRandomizer API",
+    "version": "1.0.0",
+    "description": "API documentation for ToDoRandomizer endpoints"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/AdhdAssistant/v1/getSchedule": {
+      "get": {
+        "summary": "Get the schedule for a user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Schedule for the user"
+          }
+        }
+      }
+    },
+    "/AdhdAssistant/v1/getCurrentTask": {
+      "get": {
+        "summary": "Get the current task(s) for a user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current task(s) for the user"
+          }
+        }
+      }
+    },
+    "/AdhdAssistant/v1/setCurrentTask": {
+      "get": {
+        "summary": "Set a new current task for a user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "newTaskId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new current task"
+          }
+        }
+      }
+    },
+    "/AdhdAssistant/v1/getRandomTask": {
+      "get": {
+        "summary": "Set a random task to in-progress for a user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The random task set to in-progress"
+          }
+        }
+      }
+    },
+    "/AdhdAssistant/v1/getGoals": {
+      "get": {
+        "summary": "Get all goals for a user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of goals"
+          }
+        }
+      }
+    },
+    "/AdhdAssistant/v1/setGoal": {
+      "post": {
+        "summary": "Create or update a goal",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Goal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created or updated goal"
+          }
+        }
+      }
+    },
+    "/manifestor/v1/addGoal": {
+      "post": {
+        "summary": "Add a new goal",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Goal"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new goal"
+          }
+        }
+      }
+    },
+    "/manifestor/v1/addTask": {
+      "post": {
+        "summary": "Add a new task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new task"
+          }
+        }
+      }
+    },
+    "/onboard/v1/addUser": {
+      "post": {
+        "summary": "Add a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new user"
+          }
+        }
+      }
+    },
+    "/onboard/v1/updateUser": {
+      "post": {
+        "summary": "Update an existing user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user"
+          }
+        }
+      }
+    },
+    "/scheduler/createCalendar": {
+      "post": {
+        "summary": "Create a new calendar",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Calendar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new calendar"
+          }
+        }
+      }
+    },
+    "/scheduler/createAppointment": {
+      "post": {
+        "summary": "Create a new appointment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The new appointment"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Goal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "actualGoalDescription": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CalendarUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Calendar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+} 

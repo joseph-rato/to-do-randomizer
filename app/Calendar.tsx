@@ -9,14 +9,15 @@ interface CalendarItem {
 }
 
 interface CalendarProps {
-  items: CalendarItem[];
+  appointments: CalendarItem[];
+  events: CalendarItem[];
   selectedDay: string | null;
   onDaySelect: (date: string) => void;
   currentMonth: Date;
   onMonthChange: (date: Date, dayToSelect?: string) => void;
 }
 
-export default function Calendar({ items, selectedDay, onDaySelect, currentMonth, onMonthChange }: CalendarProps) {
+export default function Calendar({ appointments, events, selectedDay, onDaySelect, currentMonth, onMonthChange }: CalendarProps) {
   const prevMonth = () => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   const nextMonth = () => onMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
 
@@ -83,7 +84,8 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
         let currentDay=day;
         formattedDate = format(day, "d");
         const isoDate = format(day, 'yyyy-MM-dd');
-        const dayItems = items.filter(item => item.date === isoDate);
+        const dayAppointments = appointments.filter(item => item.date === isoDate);
+        const dayEvents = events.filter(item => item.date === isoDate);
         const isSelected = selectedDay === isoDate;
         days.push(
           <div
@@ -97,10 +99,17 @@ export default function Calendar({ items, selectedDay, onDaySelect, currentMonth
           >
             <span>{formattedDate}</span>
             <div className="flex flex-col gap-0.5 mt-1 w-full items-center">
-              {dayItems.map(item => (
+              {dayAppointments.map(item => (
                 <span
                   key={item.id}
-                  className={`block w-2 h-2 rounded-full mb-0.5 ${item.type === 'appointment' ? 'bg-blue-500' : 'bg-green-500'}`}
+                  className="block w-2 h-2 rounded-full mb-0.5 bg-blue-500"
+                  title={item.title}
+                ></span>
+              ))}
+              {dayEvents.map(item => (
+                <span
+                  key={item.id}
+                  className="block w-2 h-2 rounded-full mb-0.5 bg-green-500"
                   title={item.title}
                 ></span>
               ))}

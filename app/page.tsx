@@ -8,9 +8,22 @@ import RandomTaskButton from "./RandomTaskButton";
 import Confetti from "./Confetti";
 import { fetchAppointments, fetchEvents } from "./api";
 
+// Define the legacy interface for compatibility
+interface CalendarItem {
+  id: number;
+  date: string;
+  title: string;
+  type: string;
+  description?: string;
+  notes?: string;
+  time?: string;
+  priority?: string;
+}
+
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [items, setItems] = useState<{ id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }[]>([]);
+  const [appointments, setAppointments] = useState<CalendarItem[]>([]);
+  const [events, setEvents] = useState<CalendarItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -20,8 +33,9 @@ export default function Home() {
     Promise.all([
       fetchAppointments(currentMonth),
       fetchEvents(currentMonth)
-    ]).then(([appointments, events]) => {
-      setItems([...appointments, ...events]);
+    ]).then(([appointmentsData, eventsData]) => {
+      setAppointments(appointmentsData as CalendarItem[]);
+      setEvents(eventsData as CalendarItem[]);
       setLoading(false);
     });
   }, [currentMonth]);
@@ -35,7 +49,8 @@ export default function Home() {
     setSelectedDay(dayToSelect ?? null);
   };
 
-  const selectedDayItems = selectedDay ? items.filter(item => item.date === selectedDay) : [];
+  const selectedDayAppointments = selectedDay ? appointments.filter(item => item.date === selectedDay) : [];
+  const selectedDayEvents = selectedDay ? events.filter(item => item.date === selectedDay) : [];
 
   const handleConfettiTrigger = () => {
     setShowConfetti(true);
@@ -43,12 +58,20 @@ export default function Home() {
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
-  const handleItemUpdate = (updatedItem: { id: number; date: string; title: string; type: string; description?: string; notes?: string; time?: string; priority?: string }) => {
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.id === updatedItem.id ? updatedItem : item
-      )
-    );
+  const handleItemUpdate = (updatedItem: CalendarItem) => {
+    if (updatedItem.type === 'appointment') {
+      setAppointments(prevAppointments => 
+        prevAppointments.map(item => 
+          item.id === updatedItem.id ? updatedItem : item
+        )
+      );
+    } else {
+      setEvents(prevEvents => 
+        prevEvents.map(item => 
+          item.id === updatedItem.id ? updatedItem : item
+        )
+      );
+    }
   };
 
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
@@ -137,7 +160,8 @@ export default function Home() {
             <div className="flex justify-center items-center h-40 text-gray-400">Loading...</div>
           ) : (
             <Calendar
-              items={items}
+              appointments={appointments}
+              events={events}
               selectedDay={selectedDay}
               onDaySelect={handleDaySelect}
               currentMonth={currentMonth}
@@ -148,7 +172,8 @@ export default function Home() {
         {selectedDay && (
           <DayDetails 
             selectedDay={selectedDay} 
-            selectedDayItems={selectedDayItems} 
+            selectedDayAppointments={selectedDayAppointments}
+            selectedDayEvents={selectedDayEvents}
             onItemUpdate={handleItemUpdate}
           />
         )}
