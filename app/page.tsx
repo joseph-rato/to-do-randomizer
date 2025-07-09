@@ -6,61 +6,7 @@ import Calendar from "./Calendar";
 import DayDetails from "./DayDetails";
 import RandomTaskButton from "./RandomTaskButton";
 import Confetti from "./Confetti";
-
-// Dummy fetch functions
-function fetchAppointments(month: Date) {
-  return new Promise<{ id: number; date: string; title: string; type: 'appointment'; description?: string; notes?: string; time?: string }[]>(resolve => {
-    setTimeout(() => {
-      resolve([
-        { 
-          id: 1, 
-          date: format(month, 'yyyy-MM-05'), 
-          title: 'Dentist', 
-          type: 'appointment',
-          time: '10:00 AM',
-          description: 'Regular dental checkup and cleaning',
-          notes: 'Bring insurance card and remember to floss before appointment'
-        },
-        { 
-          id: 2, 
-          date: format(month, 'yyyy-MM-12'), 
-          title: 'Team Meeting', 
-          type: 'appointment',
-          time: '2:00 PM',
-          description: 'Weekly team sync to discuss project progress',
-          notes: 'Prepare quarterly report for discussion'
-        },
-      ]);
-    }, 400);
-  });
-}
-
-function fetchEvents(month: Date) {
-  return new Promise<{ id: number; date: string; title: string; type: 'event'; description?: string; notes?: string; priority?: string }[]>(resolve => {
-    setTimeout(() => {
-      resolve([
-        { 
-          id: 3, 
-          date: format(month, 'yyyy-MM-12'), 
-          title: 'Birthday Party', 
-          type: 'event',
-          description: 'Celebrating Sarah\'s 30th birthday',
-          notes: 'Bring gift and RSVP by end of week',
-          priority: 'high'
-        },
-        { 
-          id: 4, 
-          date: format(month, 'yyyy-MM-20'), 
-          title: 'Conference', 
-          type: 'event',
-          description: 'Annual tech conference with industry leaders',
-          notes: 'Book hotel and prepare presentation slides',
-          priority: 'medium'
-        },
-      ]);
-    }, 400);
-  });
-}
+import { fetchAppointments, fetchEvents } from "./api";
 
 export default function Home() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
